@@ -17,6 +17,7 @@ async function run() {
   try {
     await client.connect();
     const productCollection = client.db("matrix_tools").collection("products");
+    const reviewCollection = client.db("matrix_tools").collection("review");
 
     // GET All Products
     app.get("/product", async (req, res) => {
@@ -33,16 +34,33 @@ async function run() {
         res.send(product);
       });
     });
+
+    // POST API || Add Review || Review Collection
+    app.post("/review", async (req, res) => {
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
+      res.send(result);
+    });
+
+    // API for Review Collection
+    app.get("/review", async (req, res) => {
+      const query = {};
+      const cursor = reviewCollection.find(query);
+      const reviews = await cursor.toArray();
+      res.send(reviews);
+    });
   } finally {
   }
 }
 
 run().catch(console.dir);
 
+// ROOT / Blank API
 app.get("/", (req, res) => {
   res.send("Hello from MATRIX!");
 });
 
+// Root API Supporter
 app.listen(port, () => {
   console.log(`MATRIX App listening on port ${port}`);
 });
