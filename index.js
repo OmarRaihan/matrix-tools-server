@@ -18,6 +18,7 @@ async function run() {
     await client.connect();
     const productCollection = client.db("matrix_tools").collection("products");
     const reviewCollection = client.db("matrix_tools").collection("review");
+    const newProductCollection = client.db("matrix_tools").collection("newProduct");
 
     // GET All Products
     app.get("/product", async (req, res) => {
@@ -25,14 +26,14 @@ async function run() {
       const cursor = productCollection.find(query);
       const products = await cursor.toArray();
       res.send(products);
+    });
 
-      //   API || Order by ID
-      app.get("/product/:id", async (req, res) => {
-        const id = req.params.id.trim();
-        const query = { _id: ObjectId(id) };
-        const product = await productCollection.findOne(query);
-        res.send(product);
-      });
+    //   API || Order by ID
+    app.get("/product/:id", async (req, res) => {
+      const id = req.params.id.trim();
+      const query = { _id: ObjectId(id) };
+      const product = await productCollection.findOne(query);
+      res.send(product);
     });
 
     // POST API || Add Review || Review Collection
@@ -49,6 +50,21 @@ async function run() {
       const reviews = await cursor.toArray();
       res.send(reviews);
     });
+
+    // GET New Product
+    app.get("/newProduct", async (req, res) => {
+      const query = {};
+      const cursor = newProductCollection.find(query);
+      const newProducts = await cursor.toArray();
+      res.send(newProducts);
+    });
+
+    // POST || Add New Product || newItem Collection
+    // app.post("/newProduct", async (req, res) => {
+    //   const newProduct = req.body;
+    //   const result = await newItemCollection.insertOne(newProduct);
+    //   res.send(result);
+    // });
   } finally {
   }
 }
