@@ -53,6 +53,14 @@ async function run() {
       res.send(orders);
     });
 
+    // GET All Orders || Manage Orders
+    app.get("/order", async (req, res) => {
+      const query = {};
+      const cursor = orderCollection.find(query);
+      const orders = await cursor.toArray();
+      res.send(orders);
+    });
+
     // POST API || Add Review || Review Collection
     app.post("/review", async (req, res) => {
       const review = req.body;
@@ -91,14 +99,12 @@ async function run() {
     });
 
     // GET || MyProfile
-    app.get('/profile', async(req, res) =>{
+    app.get("/profile", async (req, res) => {
       const query = {};
       const cursor = profileCollection.find(query);
-      const products = await cursor.toArray();
-      res.send(products);
-    })
-
-
+      const profile = await cursor.toArray();
+      res.send(profile);
+    });
   } finally {
   }
 }
