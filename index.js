@@ -60,11 +60,11 @@ async function run() {
     });
 
     // POST || Add New Product || newItem Collection
-    // app.post("/newProduct", async (req, res) => {
-    //   const newProduct = req.body;
-    //   const result = await newItemCollection.insertOne(newProduct);
-    //   res.send(result);
-    // });
+    app.post("/newProduct", async (req, res) => {
+      const newProduct = req.body;
+      const result = await newProductCollection.insertOne(newProduct);
+      res.send(result);
+    });
   } finally {
   }
 }
