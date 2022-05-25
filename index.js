@@ -1,7 +1,9 @@
 const express = require("express");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -21,6 +23,7 @@ async function run() {
     const reviewCollection = client.db("matrix_tools").collection("review");
     const newProductCollection = client.db("matrix_tools").collection("newProduct");
     const profileCollection = client.db("matrix_tools").collection("profile");
+    const userCollection = client.db("matrix_tools").collection("users");
 
     // GET All Products
     app.get("/product", async (req, res) => {
@@ -28,6 +31,14 @@ async function run() {
       const cursor = productCollection.find(query);
       const products = await cursor.toArray();
       res.send(products);
+    });
+
+    // DELETE || Product || from Manage Products
+    app.delete("/product/:id", async (req, res) => {
+      const id = req.params.id.trim();
+      const query = { _id: ObjectId(id) };
+      const result = await productCollection.deleteOne(query);
+      res.send(result);
     });
 
     // GET API || Order by ID
@@ -91,6 +102,14 @@ async function run() {
       res.send(result);
     });
 
+    // DELETE || New Product || from Manage Products
+    app.delete("/newProduct/:id", async (req, res) => {
+      const id = req.params.id.trim();
+      const query = { _id: ObjectId(id) };
+      const result = await newProductCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // POST || MyProfile
     app.post("/profile", async (req, res) => {
       const profile = req.body;
@@ -104,6 +123,20 @@ async function run() {
       const cursor = profileCollection.find(query);
       const profile = await cursor.toArray();
       res.send(profile);
+    });
+
+    // PUT || Users API ||
+    app.put("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: user,
+      };
+      const result = await userCollection.updateOne(filter, updateDoc, options);
+      const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1d" });
+      res.send({ result, token });
     });
   } finally {
   }
