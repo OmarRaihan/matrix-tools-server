@@ -17,8 +17,10 @@ async function run() {
   try {
     await client.connect();
     const productCollection = client.db("matrix_tools").collection("products");
+    const orderCollection = client.db("matrix_tools").collection("order");
     const reviewCollection = client.db("matrix_tools").collection("review");
     const newProductCollection = client.db("matrix_tools").collection("newProduct");
+    const profileCollection = client.db("matrix_tools").collection("profile");
 
     // GET All Products
     app.get("/product", async (req, res) => {
@@ -28,12 +30,27 @@ async function run() {
       res.send(products);
     });
 
-    //   API || Order by ID
+    // GET API || Order by ID
     app.get("/product/:id", async (req, res) => {
       const id = req.params.id.trim();
       const query = { _id: ObjectId(id) };
       const product = await productCollection.findOne(query);
       res.send(product);
+    });
+
+    // POST API || Order
+    app.post("/order", async (req, res) => {
+      const order = req.body;
+      const result = await orderCollection.insertOne(order);
+      res.send(result);
+    });
+
+    // GET API || MyOrders by Email
+    app.get("/order/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const orders = await orderCollection.find(query).toArray();
+      res.send(orders);
     });
 
     // POST API || Add Review || Review Collection
@@ -51,7 +68,7 @@ async function run() {
       res.send(reviews);
     });
 
-    // GET New Product
+    // GET || New Product
     app.get("/newProduct", async (req, res) => {
       const query = {};
       const cursor = newProductCollection.find(query);
@@ -65,6 +82,13 @@ async function run() {
       const result = await newProductCollection.insertOne(newProduct);
       res.send(result);
     });
+
+    // // POST || MyProfile
+    // app.post("/profile", async (req, res) => {
+    //   const profile = req.body;
+    //   const result = await productCollection.insertOne(profile);
+    //   res.send(result);
+    // });
   } finally {
   }
 }
