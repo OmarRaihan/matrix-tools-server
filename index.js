@@ -76,12 +76,16 @@ async function run() {
     // GET API || MyOrders by Email
     app.get("/order/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
-      const orders = await orderCollection.find(query).toArray();
-      res.send(orders);
+      const decodedEmail = req.decoded.email;
+      if (email === decodedEmail) {
+        const query = { email: email };
+        const orders = await orderCollection.find(query).toArray();
+        res.send(orders);
+      }
     });
 
     // GET All Orders || Manage Orders
-    app.get("/order", async (req, res) => {
+    app.get("/order", verifyJWT, async (req, res) => {
       const query = {};
       const cursor = orderCollection.find(query);
       const orders = await cursor.toArray();
@@ -153,6 +157,23 @@ async function run() {
       const result = await userCollection.updateOne(filter, updateDoc, options);
       const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1d" });
       res.send({ result, token });
+    });
+
+    // PUT || Make Admin
+    app.put("/user/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const filter = { email: email };
+      const updateDoc = {
+        $set: { role: "admin" },
+      };
+      const result = await userCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    // GET || All Users || Manage Admin
+    app.get("/user", verifyJWT, async (req, res) => {
+      const users = await userCollection.find().toArray();
+      res.send(users);
     });
   } finally {
   }
