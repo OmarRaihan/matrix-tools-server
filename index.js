@@ -83,12 +83,22 @@ async function run() {
       res.send(result);
     });
 
-    // // POST || MyProfile
-    // app.post("/profile", async (req, res) => {
-    //   const profile = req.body;
-    //   const result = await productCollection.insertOne(profile);
-    //   res.send(result);
-    // });
+    // POST || MyProfile
+    app.post("/profile", async (req, res) => {
+      const profile = req.body;
+      const result = await profileCollection.insertOne(profile);
+      res.send(result);
+    });
+
+    // GET || MyProfile
+    app.get('/profile', async(req, res) =>{
+      const query = {};
+      const cursor = profileCollection.find(query);
+      const products = await cursor.toArray();
+      res.send(products);
+    })
+
+
   } finally {
   }
 }
