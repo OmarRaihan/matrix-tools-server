@@ -84,6 +84,14 @@ async function run() {
       }
     });
 
+    // DELETE || Order || from MyOrders
+    app.delete("/order/:id", async (req, res) => {
+      const id = req.params.id.trim();
+      const query = { _id: ObjectId(id) };
+      const result = await orderCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // GET All Orders || Manage Orders
     app.get("/order", verifyJWT, async (req, res) => {
       const query = {};
